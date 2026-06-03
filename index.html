@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InnerHealth | 아토피 피부 장벽 정밀 진단 서비스</title>
+  <meta name="description" content="피부 증상을 입력하면 마이크로바이옴을 분석하고 맞춤 케어 솔루션을 제공하는 InnerHealth 정밀 진단 서비스입니다." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- 🌿 InnerHealth Header -->
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-icon">🌿</span>
+      <div class="brand-text">
+        <h1>InnerHealth</h1>
+        <p>Skin Barrier &amp; Biome Precision Care</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 진행 상태 인디케이터 -->
+  <div class="container">
+    <div class="step-bar" id="stepBar">
+      <div class="step-item active" id="step-ind-1">
+        <div class="step-circle">1</div>
+        <span>증상 입력</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="step-ind-2">
+        <div class="step-circle">2</div>
+        <span>가상 생검 분석</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="step-ind-3">
+        <div class="step-circle">3</div>
+        <span>장벽 맞춤 케어</span>
+      </div>
+    </div>
+
+    <!-- ===================== STEP 1: 증상 입력 ===================== -->
+    <section class="card" id="page1">
+      <div class="card-header">
+        <h2>📋 피부 상태 자가 진단</h2>
+        <p>현재 환자분이 겪고 계신 겉표면 피부 증상을 정량 평가하여 내부 마이크로바이옴 상태를 분석합니다.</p>
+      </div>
+
+      <div class="question-block">
+        <div class="question-label">
+          Q1. 환부의 가려움증은 어느 정도인가요?
+          <span class="tooltip-icon" title="가려움증은 황색포도상구균이 내뿜는 독소에 의해 피부 감각 신경 세포가 격렬하게 방전될 때 유발됩니다.">ⓘ</span>
+        </div>
+        <div class="radio-group" id="itch-group">
+          <label class="radio-card"><input type="radio" name="itch" value="0" /> <span>거의 없음 (신경 쓰이지 않는 상태)</span></label>
+          <label class="radio-card"><input type="radio" name="itch" value="1" checked /> <span>보통 (때때로 가렵고 긁음)</span></label>
+          <label class="radio-card"><input type="radio" name="itch" value="2" /> <span>심함 (가려움 때문에 밤잠을 설침)</span></label>
+          <label class="radio-card"><input type="radio" name="itch" value="3" /> <span>극심함 (상처와 피가 날 때까지 긁어야 함)</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-label">
+          Q2. 피부의 건조도 및 각질 상태는 어떤가요?
+          <span class="tooltip-icon" title="표피 보호 유익균이 사멸하면 수분 보습막을 묶어두는 각질 지질 결합력이 무너집니다.">ⓘ</span>
+        </div>
+        <div class="radio-group" id="dry-group">
+          <label class="radio-card"><input type="radio" name="dry" value="0" /> <span>촉촉하고 윤기가 있음</span></label>
+          <label class="radio-card"><input type="radio" name="dry" value="1" checked /> <span>약간 건조함 (푸석하고 가벼운 각질)</span></label>
+          <label class="radio-card"><input type="radio" name="dry" value="2" /> <span>매우 건조함 (하얗게 일어나는 각질과 거침)</span></label>
+          <label class="radio-card"><input type="radio" name="dry" value="3" /> <span>심한 건조 및 균열 (피부가 가뭄처럼 갈라짐)</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-label">
+          Q3. 환부 부위의 붉어짐(홍반)이나 뜨거운 열감이 있나요?
+          <span class="tooltip-icon" title="염증 신호 물질이 분비되면 환부에 모세혈관이 확장되고 대량의 열과 붉은 기운이 올라옵니다.">ⓘ</span>
+        </div>
+        <div class="radio-group" id="red-group">
+          <label class="radio-card"><input type="radio" name="red" value="0" /> <span>거의 없음 (피부색 정상)</span></label>
+          <label class="radio-card"><input type="radio" name="red" value="1" checked /> <span>약간 붉고 미지근함</span></label>
+          <label class="radio-card"><input type="radio" name="red" value="2" /> <span>확연히 붉음 (넓은 범위가 붉어짐)</span></label>
+          <label class="radio-card"><input type="radio" name="red" value="3" /> <span>불타는 듯이 빨갛고 강한 화끈거림 (심한 급성 염증)</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-label">
+          Q4. 피부 상처에 진물이 나거나 딱지가 앉아 있나요?
+          <span class="tooltip-icon" title="진물은 황색포도상구균이 급격히 바이오필름 막을 쳐 표피 결합을 뜯어낼 때 흐르는 세포 간 삼출액입니다.">ⓘ</span>
+        </div>
+        <div class="radio-group" id="ooze-group">
+          <label class="radio-card"><input type="radio" name="ooze" value="0" checked /> <span>진물이나 딱지 없음 (건조하거나 가려운 상태)</span></label>
+          <label class="radio-card"><input type="radio" name="ooze" value="1" /> <span>미세한 진물 및 끈적임</span></label>
+          <label class="radio-card"><input type="radio" name="ooze" value="2" /> <span>노란 진물이 줄줄 흐르고 상처에 피딱지가 가득 차 앉음</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-label">
+          Q5. 증상이 가장 두드러지게 나타나는 신체 부위는 어디인가요?
+          <span class="tooltip-icon" title="부위별 피지선 및 마찰 조건에 따라 피부의 상재 미생물 기준 환경이 보정됩니다.">ⓘ</span>
+        </div>
+        <select class="select-input" id="area-select">
+          <option value="0">접히는 관절 부위 (팔 오금, 무릎 뒤쪽)</option>
+          <option value="1">얼굴 / 목</option>
+          <option value="2">손 및 발</option>
+          <option value="3">몸통 및 신체 전체</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" onclick="goToStep2()">내 피부 장벽 분석하기 ➔</button>
+    </section>
+
+    <!-- ===================== STEP 2: 가상 생검 분석 ===================== -->
+    <section class="card hidden" id="page2">
+      <div class="card-header">
+        <h2>🧬 2단계: 가상 생검 (Virtual Biopsy) 및 심각도 판정</h2>
+      </div>
+
+      <!-- 핵심 지표 2개 -->
+      <div class="metrics-row" id="metricsRow"></div>
+
+      <!-- 도넛 차트 + 판독 카드 -->
+      <div class="chart-row">
+        <div class="chart-box">
+          <canvas id="donutChart"></canvas>
+        </div>
+        <div class="readout-card" id="readoutCard"></div>
+      </div>
+
+      <!-- 학술 가이드 아코디언 (그래프 바로 아래) -->
+      <details class="accordion">
+        <summary>📚 [학술 임상 가이드] 6대 미생물 상재균의 상세 역할 요약</summary>
+        <div class="accordion-body">
+          <ul>
+            <li><strong>황색포도상구균 (S. aureus)</strong> — [아토피 가해균] 세포벽 분해 효소와 독소를 내뿜어 수분 장벽을 가루내고 극심한 가려움증을 트리거합니다.</li>
+            <li><strong>표피포도상구균 (S. epidermidis)</strong> — [방어선 유익균] 유해 세균 성장을 억제하는 AMP를 분비하며, 글리세롤 대사로 약산성 pH 5.5 보호막을 형성합니다.</li>
+            <li><strong>C. 아크네스 (C. acnes)</strong> — [공생 결합균] 피부 모공층에서 적정량 서식 시 피지를 자유 지방산으로 분해해 자연 코팅막의 유기산 농도를 지켜줍니다.</li>
+            <li><strong>코리네박테리움 (Corynebacterium)</strong> — [관절 접힘 연합균] 땀이 많고 접히는 부위에서 황색포도상구균과 공생하며 아토피 병변 확장에 관여합니다.</li>
+            <li><strong>마이크로코쿠스 (Micrococcus)</strong> — [건조지역 방어균] 건조하고 노출된 표피에서 외부 잔류 독소를 해독하고 수분막 고정을 돕습니다.</li>
+            <li><strong>스트렙토코쿠스 (Streptococcus)</strong> — [pH 협동 중재균] 천연 보습 환경 조성 시 수소이온 농도를 미세 매개하여 표피 면역 조화를 돕습니다.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goToStep(1)">⬅ 이전 (증상 수정)</button>
+        <button class="btn-primary" onclick="goToStep3()">정밀 케어 처방전 받기 ➔</button>
+      </div>
+    </section>
+
+    <!-- ===================== STEP 3: 맞춤 케어 처방 ===================== -->
+    <section class="card hidden" id="page3">
+      <div class="card-header">
+        <h2>🌿 3단계: 맞춤 정밀 케어 및 4주 피부 재건 처방</h2>
+        <p>InnerHealth 연구팀이 마련한 고품격 3단계 듀얼 장벽 케어 전략입니다.</p>
+      </div>
+
+      <!-- 제품 커머스 추천 -->
+      <h3 class="section-title">🛍️ 1단계: 피부과 공인 맞춤형 보습 제품 처방</h3>
+      <p class="section-sub">환자분의 마이크로바이옴 불균형을 신속히 억제하고 지질막을 복구하는 임상용 실제 프리미엄 제품군 매칭입니다.</p>
+      <div class="product-grid" id="productGrid"></div>
+
+      <!-- 4주 타임라인 라인 차트 -->
+      <h3 class="section-title" style="margin-top:2rem;">📅 2단계: 4주 피부 마이크로바이옴 재건 타임라인 로드맵</h3>
+      <p class="section-sub">InnerHealth의 케어 처방을 철저히 고수했을 시 예상되는 주차별 피부 속 미생물 분포의 과학적 변화 시뮬레이션입니다.</p>
+      <div class="chart-box-wide">
+        <canvas id="lineChart"></canvas>
+      </div>
+
+      <!-- 홈케어 & 의학 가이드 탭 -->
+      <h3 class="section-title" style="margin-top:2rem;">🛁 3단계: 홈 케어 행동 지침 &amp; 의학 가이드</h3>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-home')">🚿 홈 케어 행동 지침</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-clinic')">🏥 병원 의학 안전 가이드</button>
+      </div>
+      <div class="tab-content active" id="tab-home">
+        <ol class="guide-list">
+          <li><strong>3분 안심 보습 요령</strong>: 샤워/목욕은 <strong>35℃ 전후 미지근한 물</strong>로 맞춰주시고 피지 탈락을 막기 위해 <strong>10분 이내</strong>로 종료해 주세요. 수분이 말라가기 전인 <strong>3분 이내</strong>에 전신 보습 크림을 정밀하게 바릅니다.</li>
+          <li><strong>약산성 pH 5.5 클렌저 선택</strong>: 유익균이 서식하기 적합한 pH 5.5 규격의 <strong>약산성 페이셜/바디 워시</strong>만 엄격히 선별 사용해 유해 알칼리성을 밀어내세요.</li>
+          <li><strong>완벽한 실내 온도 및 습도</strong>: 온도 <strong>20~22℃</strong>, 습도 <strong>50~60%</strong>는 건조함을 물리치고 가려움 신경의 오작동을 차단하는 골디락스 영역입니다.</li>
+          <li><strong>면 100% 가드 및 세제 더블 헹굼</strong>: 순면 100% 의류를 입히시며, 빨래 시에는 잔류 화학 물질이 없도록 세탁기 헹굼을 기본 2회 이상 추가해 주세요.</li>
+        </ol>
+      </div>
+      <div class="tab-content" id="tab-clinic" style="display:none;">
+        <div id="clinicGuide"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goToStep(2)">⬅ 이전 (생검 결과)</button>
+        <button class="btn-secondary" onclick="resetAll()">🔄 처음부터 다시 진단하기</button>
+      </div>
+    </section>
+
+    <!-- 하단 면책 -->
+    <footer class="site-footer">
+      본 자가진단 및 케어 처방 솔루션은 피부 과학 연구 및 논문 데이터를 토대로 가상의 마이크로바이옴 시뮬레이션을 제공하는 참고용 비의학 서비스 프로토타입입니다.<br />
+      감염 증세가 심하거나 상처가 깊은 환자분의 경우 반드시 소아청소년과 혹은 피부과 전문의의 대면 임상 검사를 받으시기 바랍니다.<br />
+      © 2026 InnerHealth Skin Informatics Lab. All rights reserved.
+    </footer>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
