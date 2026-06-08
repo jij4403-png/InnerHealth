@@ -122,15 +122,28 @@
         <h2>🧬 2단계: 가상 생검 (Virtual Biopsy) 및 심각도 판정</h2>
       </div>
 
-      <!-- 핵심 지표 2개 -->
-      <div class="metrics-row" id="metricsRow"></div>
-
-      <!-- 도넛 차트 + 판독 카드 -->
+      <!-- [1. 분석 결과 시각화 강화] 4개 핵심 지표 카드 및 가로 막대 그래프 -->
       <div class="chart-row">
-        <div class="chart-box">
+        <div class="metrics-grid-4" id="metricsGrid4"></div>
+        <div class="chart-box" style="height: 205px;">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- [2. 가상 피부 미생물 분석 섹션 추가] -->
+      <h3 class="section-title" style="margin-top: 1.5rem;">🔬 예상 피부 마이크로바이옴 분석</h3>
+      <div class="microbe-grid" id="microbeGrid"></div>
+      <div style="font-size: 0.72rem; color: #94A3B8; margin-top: -0.5rem; margin-bottom: 1.5rem; text-align: right;">
+        ⚠️ 본 분석은 실제 의료 진단이 아닌 가설적 임상 모델에 기반한 가상 생검 시뮬레이션입니다.
+      </div>
+
+      <!-- 6대 미생물 상재균 도넛 분포 -->
+      <h3 class="section-title">📊 가상 마이크로바이옴 상재균 분포</h3>
+      <div class="chart-row">
+        <div class="chart-box" style="height: 200px;">
           <canvas id="donutChart"></canvas>
         </div>
-        <div class="readout-card" id="readoutCard"></div>
+        <div class="readout-card" id="readoutCard" style="min-height: 200px;"></div>
       </div>
 
       <!-- 학술 가이드 아코디언 (그래프 바로 아래) -->

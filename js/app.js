@@ -9,6 +9,7 @@
 let analysisData = null;
 let donutChartInst = null;
 let lineChartInst  = null;
+let barChartInst   = null; // [1. 분석 결과 시각화 강화] 가로 막대 그래프 추가
 
 // ──────────────────────────────────────
 // 2. Core Microbiome Simulation Engine
@@ -120,6 +121,7 @@ function resetAll() {
   analysisData = null;
   if (donutChartInst) { donutChartInst.destroy(); donutChartInst = null; }
   if (lineChartInst)  { lineChartInst.destroy();  lineChartInst  = null; }
+  if (barChartInst)   { barChartInst.destroy();   barChartInst   = null; }
   goToStep(1);
 }
 
@@ -127,24 +129,138 @@ function resetAll() {
 // 4. Render Step 2 — Analysis
 // ──────────────────────────────────────
 function renderStep2(data) {
-  const { scorad, severity, severityColor, severityBg, pcts, barrier } = data;
+  const { scorad, severity, severityColor, severityBg, pcts, barrier, answers } = data;
+  const { itch, dry, red, ooze, area } = answers;
 
-  // Metric cards
-  const mr = document.getElementById('metricsRow');
-  mr.innerHTML = `
-    <div class="metric-card" style="border-top-color:${severityColor};">
-      <div class="metric-label">SCORAD 지수</div>
-      <div class="metric-value" style="color:${severityColor};">${scorad}</div>
-      <div class="metric-sub" style="color:${severityColor}; background:${severityBg}; padding:3px 8px; border-radius:6px; display:inline-block;">${severity}</div>
+  // [1. 분석 결과 시각화 강화]
+  // 4개 핵심 지표 점수 계산 (0-100점 척도)
+  const barrier_health = barrier;
+  const dry_risk = Math.min(100, Math.round(dry * 26 + itch * 5 + 10));
+  const inflammation_risk = Math.min(100, Math.round(red * 22 + ooze * 16 + itch * 5));
+
+  // Shannon entropy 다양도 계산
+  const p = pcts.map(v => v / 100).filter(v => v > 0);
+  const shannon_h = -p.reduce((acc, val) => acc + val * Math.log(val), 0);
+  const max_h = Math.log(pcts.length);
+  const shannon_pct = (shannon_h / max_h) * 100;
+
+  const aureus_pct = pcts[0];
+  const epidermidis_pct = pcts[1];
+  const acnes_pct = pcts[2];
+  const mbi_val = (epidermidis_pct + acnes_pct) / (aureus_pct + 0.1);
+  const mbi_score = Math.min(100, mbi_val * 10);
+  const microbiome_balance = Math.min(100, Math.round(shannon_pct * 0.6 + mbi_score * 0.4));
+
+  // Render 4 Score Cards
+  const mg = document.getElementById('metricsGrid4');
+  mg.innerHTML = `
+    <div class="metric-card" style="border-top-color:#2D6A4F; padding: 0.8rem;">
+      <div class="metric-label" style="font-size: 0.72rem; color:#64748B;">피부 장벽 건강도</div>
+      <div class="metric-value" style="color:#2D6A4F; font-size: 1.7rem; font-weight:800; margin: 2px 0;">${barrier_health} <span style="font-size:0.8rem; font-weight:500;">점</span></div>
     </div>
-    <div class="metric-card" style="border-top-color:#40916C;">
-      <div class="metric-label">피부 장벽 무결성</div>
-      <div class="metric-value" style="color:${barrier < 40 ? '#DC2626' : barrier < 60 ? '#D97706' : '#40916C'};">${barrier}%</div>
-      <div class="metric-sub" style="color:#64748B;">${barrier < 40 ? '⚠️ 손상됨' : barrier < 60 ? '📊 약화됨' : '✅ 양호'}</div>
+    <div class="metric-card" style="border-top-color:#F59E0B; padding: 0.8rem;">
+      <div class="metric-label" style="font-size: 0.72rem; color:#64748B;">피부 건조 위험도</div>
+      <div class="metric-value" style="color:#F59E0B; font-size: 1.7rem; font-weight:800; margin: 2px 0;">${dry_risk} <span style="font-size:0.8rem; font-weight:500;">점</span></div>
+    </div>
+    <div class="metric-card" style="border-top-color:#EF4444; padding: 0.8rem;">
+      <div class="metric-label" style="font-size: 0.72rem; color:#64748B;">피부 염증 위험도</div>
+      <div class="metric-value" style="color:#EF4444; font-size: 1.7rem; font-weight:800; margin: 2px 0;">${inflammation_risk} <span style="font-size:0.8rem; font-weight:500;">점</span></div>
+    </div>
+    <div class="metric-card" style="border-top-color:#3B82F6; padding: 0.8rem;">
+      <div class="metric-label" style="font-size: 0.72rem; color:#64748B;">피부 미생물 균형도</div>
+      <div class="metric-value" style="color:#3B82F6; font-size: 1.7rem; font-weight:800; margin: 2px 0;">${microbiome_balance} <span style="font-size:0.8rem; font-weight:500;">점</span></div>
     </div>
   `;
 
-  // Donut Chart
+  // Horizontal Bar Chart
+  if (barChartInst) barChartInst.destroy();
+  const ctxBar = document.getElementById('barChart').getContext('2d');
+  barChartInst = new Chart(ctxBar, {
+    type: 'bar',
+    data: {
+      labels: ['피부 장벽도', '건조 위험도', '염증 위험도', '미생물 균형도'],
+      datasets: [{
+        data: [barrier_health, dry_risk, inflammation_risk, microbiome_balance],
+        backgroundColor: ['#2D6A4F', '#F59E0B', '#EF4444', '#3B82F6'],
+        borderRadius: 6,
+        borderWidth: 0,
+        barThickness: 16
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 100,
+          grid: { color: 'rgba(0,0,0,0.04)' }
+        },
+        y: {
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // [2. 가상 피부 미생물 분석 섹션 추가]
+  let aureusBadge, aureusDesc, aureusRel;
+  if (aureus_pct >= 20.0) {
+    aureusBadge = '<span class="microbe-status-up">🔺 증가 (위험)</span>';
+    aureusDesc = '아토피 및 염증성 피부에서 지배적으로 증가하며 독소를 내뿜어 피부 장벽을 파괴하는 유해균입니다.';
+    aureusRel = '⚠️ 가려움증 극대화 및 피부 자극, 노란 진물/피딱지 유발 가능성이 매우 높습니다.';
+  } else {
+    aureusBadge = '<span class="microbe-status-normal">🟢 정상 (낮음)</span>';
+    aureusDesc = '건강한 피부의 정상 범위에 있으며 장벽 손상 독소를 방출하지 않는 상태입니다.';
+    aureusRel = '✅ 2차 감염 위험이 낮으며 가려움 발작 유발 가능성이 최소화되었습니다.';
+  }
+
+  let acnesBadge, acnesDesc, acnesRel;
+  if (dry >= 2 || itch >= 2) {
+    acnesBadge = '<span class="microbe-status-down">🔻 감소 (장벽 약화)</span>';
+    acnesDesc = '모공층에서 피지를 분해해 자연 코팅막의 유기산 농도와 약산성 장벽을 지키는 유익 공생균입니다.';
+    acnesRel = '⚠️ 보호벽 상실로 인해 수분 수치가 빠르게 떨어지며 각질 들뜸 현상이 유발됩니다.';
+  } else {
+    acnesBadge = '<span class="microbe-status-normal">🟢 정상 (안정)</span>';
+    acnesDesc = '표피 모공 근처에 정상 상재하여 천연 피지 유기산 코팅막 형성에 기여하고 있습니다.';
+    acnesRel = '✅ 자연 보습막 보호 기능이 정상적으로 활성화되어 건조 위험이 억제됩니다.';
+  }
+
+  let coryneBadge, coryneDesc, coryneRel;
+  if (area === 0 || ooze >= 1) {
+    coryneBadge = '<span class="microbe-status-up">🔺 증가 (민감성)</span>';
+    coryneDesc = '땀이 많고 접히는 환경이나 삼출액이 있는 부위에서 급격히 증가하는 경향을 보이는 상재균입니다.';
+    coryneRel = '⚠️ 황색구균과 결합하여 면역 세포를 과자극하고 피부 접힘부 민감도를 증폭시킬 수 있습니다.';
+  } else {
+    coryneBadge = '<span class="microbe-status-normal">🟢 정상 (안정)</span>';
+    coryneDesc = '습윤 마찰 부위가 아니므로 과증식하지 않고 안정적인 수준을 유지하고 있습니다.';
+    coryneRel = '✅ 접힘 부위의 특이성 염증 신호 자극 및 습윤 가려움 반응이 억제된 상태입니다.';
+  }
+
+  const microbeGrid = document.getElementById('microbeGrid');
+  microbeGrid.innerHTML = `
+    <div class="microbe-card">
+      <div class="microbe-name">Staphylococcus aureus ${aureusBadge}</div>
+      <div class="microbe-desc">${aureusDesc}</div>
+      <div class="microbe-rel">${aureusRel}</div>
+    </div>
+    <div class="microbe-card">
+      <div class="microbe-name">Cutibacterium spp. ${acnesBadge}</div>
+      <div class="microbe-desc">${acnesDesc}</div>
+      <div class="microbe-rel">${acnesRel}</div>
+    </div>
+    <div class="microbe-card">
+      <div class="microbe-name">Corynebacterium ${coryneBadge}</div>
+      <div class="microbe-desc">${coryneDesc}</div>
+      <div class="microbe-rel">${coryneRel}</div>
+    </div>
+  `;
+
+  // 6대 미생물 Donut Chart
   if (donutChartInst) donutChartInst.destroy();
   const ctx = document.getElementById('donutChart').getContext('2d');
   donutChartInst = new Chart(ctx, {
@@ -177,10 +293,7 @@ function renderStep2(data) {
 
   // Readout card
   const rc = document.getElementById('readoutCard');
-  const badMicrobe = MICROBES[0];
-  const goodMicrobe = MICROBES[1];
   const badPct  = pcts[0];
-  const goodPct = pcts[1];
   const caution = badPct > 20 ? '⚠️ 황색포도상구균 과증식 감지 — 즉각적인 마이크로바이옴 균형 복원이 필요합니다.' : '✅ 유해균 수치는 허용 범위 내에 있습니다.';
 
   rc.innerHTML = `
@@ -200,37 +313,46 @@ function renderStep2(data) {
 // ──────────────────────────────────────
 // 5. Render Step 3 — Care Plan
 // ──────────────────────────────────────
+// [3. 제품 추천 페이지 구매 링크 개선]
 const PRODUCTS = [
   {
-    icon: '💧', badge: '🏅 1순위 — 긴급 보습', name: 'Physiogel AI Cream',
+    icon: '💧', badge: '🏅 1순위 — 긴급 보습', name: '피지오겔 AI 리페어 크림',
     desc: '세라마이드 강화 · 피부과학 기반',
     body: '염증성 피부 장벽 재건에 특화된 세라마이드 집중 보습제. 황색포도상구균의 침투를 물리적으로 차단합니다.',
-    price: '26,000원', coupon: '10% 쿠폰', tag: 'bestmall',
+    price: '26,000원', coupon: '10% 쿠폰',
+    naver: 'https://search.shopping.naver.com/search/all?query=피지오겔+AI+리페어+크림',
+    coupang: 'https://www.coupang.com/np/search?q=피지오겔+AI+리페어+크림'
   },
   {
-    icon: '🧴', badge: '🥈 2순위 — 유익균 증식', name: 'La Roche-Posay Lipikar',
+    icon: '🧴', badge: '🥈 2순위 — 유익균 증식', name: '라로슈포제 리피카',
     desc: '프리바이오틱스 · 보호막 강화',
     body: '표피포도상구균(유익균)의 증식을 촉진하는 프리바이오틱 성분이 포함된 프리미엄 바디 로션.',
-    price: '48,000원', coupon: '적립금 3%', tag: 'oliveyoung',
+    price: '48,000원', coupon: '적립금 3%',
+    naver: 'https://search.shopping.naver.com/search/all?query=라로슈포제+리피카',
+    coupang: 'https://www.coupang.com/np/search?q=라로슈포제+리피카'
   },
   {
     icon: '🌊', badge: '🥉 3순위 — pH 복원', name: '아벤느 테르말 크림',
     desc: '열천수 성분 · 산성 보호막 복원',
     body: '약산성 pH 5.5를 복원해 유익균 서식에 최적인 표피 환경을 되돌리는 프랑스 열천수 기반 크림.',
-    price: '38,000원', coupon: '회원 할인 15%', tag: 'avene',
+    price: '38,000원', coupon: '회원 할인 15%',
+    naver: 'https://search.shopping.naver.com/search/all?query=아벤느+테르말+크림',
+    coupang: 'https://www.coupang.com/np/search?q=아벤느+테르말+크림'
   },
   {
-    icon: '🫧', badge: '🛁 세안 & 클렌징', name: 'Dove 뉴트리엄모이스처',
+    icon: '🫧', badge: '🛁 세안 & 클렌징', name: '도브 뉴트리엄모이스처',
     desc: '약산성 pH 5.5 바디워시',
     body: '피지를 보존하는 1/4 모이스처 배합으로 세정 후에도 유익균 기반의 약산성 피부 방어막이 유지됩니다.',
-    price: '8,900원', coupon: '2+1 이벤트', tag: 'coupang',
+    price: '8,900원', coupon: '2+1 이벤트',
+    naver: 'https://search.shopping.naver.com/search/all?query=도브+뉴트리엄모이스처',
+    coupang: 'https://www.coupang.com/np/search?q=도브+뉴트리엄모이스처'
   },
 ];
 
 function renderStep3(data) {
   const { scorad, severity, severityColor, pcts } = data;
 
-  // Products
+  // Products with search links
   const pg = document.getElementById('productGrid');
   pg.innerHTML = PRODUCTS.map(p => `
     <div class="product-card">
@@ -243,9 +365,15 @@ function renderStep3(data) {
         </div>
       </div>
       <div class="prod-body">${p.body}</div>
-      <div class="prod-footer">
-        <span style="font-weight:700;color:#1B4332;">${p.price}</span>
-        <span class="coupon-badge">${p.coupon}</span>
+      <div style="margin-top:10px; border-top:1px solid #F1F5F9; padding-top:8px;">
+        <div class="prod-footer" style="margin-bottom:8px; border-top:none; padding-top:0;">
+          <span style="font-weight:700;color:#1B4332;">${p.price}</span>
+          <span class="coupon-badge">${p.coupon}</span>
+        </div>
+        <div class="shop-btn-container">
+          <a href="${p.naver}" target="_blank" class="shop-btn btn-naver">네이버쇼핑에서 보기</a>
+          <a href="${p.coupang}" target="_blank" class="shop-btn btn-coupang">쿠팡에서 보기</a>
+        </div>
       </div>
     </div>
   `).join('');

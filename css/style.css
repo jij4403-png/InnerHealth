@@ -536,3 +536,139 @@ body {
   .card               { padding: 1.2rem; }
   .brand-text h1      { font-size: 1.3rem; }
 }
+
+/* ---- Premium Shopping Buttons & Microbe Cards ---- */
+.shop-btn-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid #F1F5F9;
+  padding-top: 10px;
+  width: 100%;
+}
+
+.shop-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  border-radius: 8px;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+}
+
+.btn-naver {
+  background-color: #03C75A !important;
+  color: #FFFFFF !important;
+}
+
+.btn-naver:hover {
+  background-color: #02a64a !important;
+  color: #FFFFFF !important;
+}
+
+.btn-coupang {
+  background-color: #E21A1A !important;
+  color: #FFFFFF !important;
+}
+
+.btn-coupang:hover {
+  background-color: #c41212 !important;
+  color: #FFFFFF !important;
+}
+
+/* 4 Score Cards Grid */
+.metrics-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 480px) {
+  .metrics-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Biopsy Microbe Card styling */
+.microbe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.microbe-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+  transition: all 0.2s;
+}
+
+.microbe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+  border-color: var(--primary-light);
+}
+
+.microbe-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.microbe-status-up {
+  color: #EF4444;
+  font-weight: 800;
+  font-size: 0.75rem;
+  background: #FEE2E2;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.microbe-status-down {
+  color: #2563EB;
+  font-weight: 800;
+  font-size: 0.75rem;
+  background: #DBEAFE;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.microbe-status-normal {
+  color: #10B981;
+  font-weight: 800;
+  font-size: 0.75rem;
+  background: #D1FAE5;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.microbe-desc {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.microbe-rel {
+  font-size: 0.72rem;
+  color: var(--text);
+  font-weight: 500;
+  border-top: 1px dashed #E2E8F0;
+  padding-top: 6px;
+}
